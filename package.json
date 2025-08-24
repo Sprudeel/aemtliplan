@@ -24,6 +24,7 @@
     "@mdi/font": "^7.4.47",
     "@prisma/client": "^5.22.0",
     "bcryptjs": "^3.0.2",
+    "vee-validate": "^4.15.1",
     "zod": "^4.1.1"
   }
 }
