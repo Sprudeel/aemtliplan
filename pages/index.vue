@@ -1,5 +1,8 @@
 <template>
-  <div>HALLO!</div>
+  <div>TES</div>
+  <pre>{{ data.test }}</pre>
 </template>
 
-<script setup></script>
+<script setup lang="ts">
+const { data } = await useFetch('/api/test');
+</script>
