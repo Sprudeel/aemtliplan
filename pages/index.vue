@@ -8,10 +8,6 @@ const setupMode = computed(() => !setup.value?.initialized)
 <template>
   <div class="max-w-md mx-auto p-8">
     <template v-if="setupMode">
-      <h1 class="text-2xl font-semibold mb-2">Welcome 👋</h1>
-      <p class="text-gray-600 mb-6">
-        Thanks for spinning up this app. Create the first admin account to get started.
-      </p>
       <SetupForm />
     </template>
 
