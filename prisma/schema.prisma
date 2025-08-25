@@ -33,11 +33,11 @@ model Session {
 }
 
 model Group {
-  id        Int      @id @default(autoincrement())
-  name      String   @unique
-  // Store member names as a JSON array of strings, e.g. ["Lena","Tim"]
-  members   Member[]
-  createdAt DateTime @default(now())
+  id            Int      @id @default(autoincrement())
+  name          String   @unique
+  rotationIndex Int      @unique // position in the single rotation ring (0..N-1)
+  members       Member[]
+  createdAt     DateTime @default(now())
 
   assignments GroupJob[]
 }
@@ -52,19 +52,21 @@ model Member {
 }
 
 model Job {
-  id          Int      @id @default(autoincrement())
-  name        String   @unique
-  icon        String? // URL, emoji, or slug for your icon set
-  description String?
-  createdAt   DateTime @default(now())
+  id              Int      @id @default(autoincrement())
+  name            String   @unique
+  icon            String?
+  rotationPointer Int      @default(0) // job’s position within the ring
+  description     String?
+  createdAt       DateTime @default(now())
 
-  assignments GroupJob[]
+  current    GroupJob?
+  placements JobPlacement[]
 }
 
 model GroupJob {
   id        Int      @id @default(autoincrement())
   groupId   Int
-  jobId     Int
+  jobId     Int      @unique
   createdAt DateTime @default(now())
 
   group Group @relation(fields: [groupId], references: [id], onDelete: Cascade)
@@ -72,5 +74,17 @@ model GroupJob {
 
   // prevent duplicate pairings
   @@unique([groupId, jobId])
-  @@index([jobId])
+}
+
+model JobPlacement {
+  id      Int @id @default(autoincrement())
+  jobId   Int
+  row     Int @default(1)
+  col     Int @default(1)
+  rowSpan Int @default(1)
+  colSpan Int @default(1)
+
+  job Job @relation(fields: [jobId], references: [id], onDelete: Cascade)
+
+  @@unique([jobId])
 }
