@@ -27,6 +27,12 @@ async function main() {
         prisma.group.create({ data: { name: 'Gruppe 1', rotationIndex: 0, color: '#C9E4DE' } }),
         prisma.group.create({ data: { name: 'Gruppe 2', rotationIndex: 1, color: '#C6DEF1'  } }),
         prisma.group.create({ data: { name: 'Gruppe 3', rotationIndex: 2, color: '#FAEDCB'  } }),
+        prisma.group.create({ data: { name: 'Gruppe 4', rotationIndex: 3, color: '#FAEDCB'  } }),
+        prisma.group.create({ data: { name: 'Gruppe 5', rotationIndex: 4, color: '#FAEDCB'  } }),
+        prisma.group.create({ data: { name: 'Gruppe 6', rotationIndex: 5, color: '#FAEDCB'  } }),
+        prisma.group.create({ data: { name: 'Gruppe 7', rotationIndex: 6, color: '#FAEDCB'  } }),
+        prisma.group.create({ data: { name: 'Gruppe 8', rotationIndex: 7, color: '#FAEDCB'  } }),
+        prisma.group.create({ data: { name: 'Gruppe 9', rotationIndex: 8, color: '#FAEDCB'  } }),
     ])
 
     // Mitglieder
@@ -38,6 +44,12 @@ async function main() {
             { name: 'Sueno', groupId: groups[1].id },
             { name: 'Xanadu', groupId: groups[2].id },
             { name: 'Sprudel', groupId: groups[2].id },
+            { name: 'Contenta', groupId: groups[3].id },
+            { name: 'Gecko', groupId: groups[3].id },
+            { name: 'Clever', groupId: groups[7].id },
+            { name: 'Sueno', groupId: groups[4].id },
+            { name: 'Xanadu', groupId: groups[5].id },
+            { name: 'Sprudel', groupId: groups[6].id },
         ],
     })
 
@@ -51,6 +63,24 @@ async function main() {
         }),
         prisma.job.create({
             data: { name: 'Haupthalle', icon: '🧹', description: 'Putzen & Tische ordnen', rotationPointer: 2 },
+        }),
+        prisma.job.create({
+            data: { name: 'Testing', icon: '🧹', description: 'Putzen & Tische ordnen', rotationPointer: 3 },
+        }),
+        prisma.job.create({
+            data: { name: 'Testing2', icon: '🧹', description: 'Putzen & Tische ordnen', rotationPointer: 4 },
+        }),
+        prisma.job.create({
+            data: { name: 'Testing4', icon: '🧹', description: 'Putzen & Tische ordnen', rotationPointer: 5 },
+        }),
+        prisma.job.create({
+            data: { name: 'Testing5', icon: '🧹', description: 'Putzen & Tische ordnen', rotationPointer: 6 },
+        }),
+        prisma.job.create({
+            data: { name: 'Testing6', icon: '🧹', description: 'Putzen & Tische ordnen', rotationPointer: 7 },
+        }),
+        prisma.job.create({
+            data: { name: 'Testing7', icon: '🧹', description: 'Putzen & Tische ordnen', rotationPointer: 8 },
         }),
     ])
 
