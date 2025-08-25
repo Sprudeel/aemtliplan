@@ -31,3 +31,46 @@ model Session {
   @@index([userId])
   @@index([expiresAt])
 }
+
+model Group {
+  id        Int      @id @default(autoincrement())
+  name      String   @unique
+  // Store member names as a JSON array of strings, e.g. ["Lena","Tim"]
+  members   Member[]
+  createdAt DateTime @default(now())
+
+  assignments GroupJob[]
+}
+
+model Member {
+  id      Int    @id @default(autoincrement())
+  name    String
+  groupId Int
+  group   Group  @relation(fields: [groupId], references: [id], onDelete: Cascade)
+
+  @@unique([groupId, name])
+}
+
+model Job {
+  id          Int      @id @default(autoincrement())
+  name        String   @unique
+  icon        String? // URL, emoji, or slug for your icon set
+  description String?
+  createdAt   DateTime @default(now())
+
+  assignments GroupJob[]
+}
+
+model GroupJob {
+  id        Int      @id @default(autoincrement())
+  groupId   Int
+  jobId     Int
+  createdAt DateTime @default(now())
+
+  group Group @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  job   Job   @relation(fields: [jobId], references: [id], onDelete: Cascade)
+
+  // prevent duplicate pairings
+  @@unique([groupId, jobId])
+  @@index([jobId])
+}
