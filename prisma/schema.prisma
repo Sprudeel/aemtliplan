@@ -35,6 +35,7 @@ model Session {
 model Group {
   id            Int      @id @default(autoincrement())
   name          String   @unique
+  color         String   @default("#000000")
   rotationIndex Int      @unique // position in the single rotation ring (0..N-1)
   members       Member[]
   createdAt     DateTime @default(now())
