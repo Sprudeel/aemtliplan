@@ -94,11 +94,11 @@ const bgStyle = computed(() =>
           </div>
 
           <!-- Jobs grid (Job is top-level; inside each card: assigned group + members) -->
-          <div class="jobs-grid grid gap-6 sm:gap-7 md:gap-8" :style="{ '--cols': (cards.length <= 4 ? (cards.length || 1) : (cards.length <= 8 ? Math.ceil(cards.length / 2) : Math.min(6, Math.ceil(Math.sqrt(cards.length))))) }">
+          <div class="relative jobs-grid grid gap-6 sm:gap-7 md:gap-8" :style="{ '--cols': (cards.length <= 4 ? (cards.length || 1) : (cards.length <= 8 ? Math.ceil(cards.length / 2) : Math.min(6, Math.ceil(Math.sqrt(cards.length))))) }">
             <article
               v-for="c in cards"
               :key="c.id"
-              class="h-64 rounded-2xl border border-gray-200/70 bg-white/95 backdrop-blur-sm shadow-sm hover:shadow-md transition-shadow duration-200 flex flex-col"
+              class="h-64 max-w-72  rounded-2xl border border-gray-200/70 bg-white/95 backdrop-blur-sm shadow-sm hover:shadow-md transition-shadow duration-200 flex flex-col"
             >
               <!-- Job header -->
               <div class="p-4 flex items-start gap-3 grow-0">
@@ -112,7 +112,7 @@ const bgStyle = computed(() =>
               <v-divider />
 
               <!-- Assigned group & members -->
-              <div class="px-4 pt-3 pb-4 grow overflow-hidden">
+              <div class="px-4 pt-3 pb-4 grow overflow-y-scroll">
                 <div class="mb-2 text-xs uppercase tracking-wide text-gray-500">Zugeordnete Gruppe</div>
                 <div class="flex items-center gap-2 mb-3">
                   <v-chip :color="c.color" variant="flat" prepend-icon="mdi-account-group-outline">{{ c.groupName }}</v-chip>
