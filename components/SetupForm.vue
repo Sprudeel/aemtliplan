@@ -44,7 +44,7 @@ const onSubmit = handleSubmit(async (values) => {
 
 <template>
   <div class="text-center py-6">
-    <img class="w-48  my-8 mx-auto m-6" src="~/public/logo.png" alt="">
+    <img class="w-48  my-8 mx-auto m-6" src="~/public/logo2.png" alt="">
     <h1 class="text-2xl font-semibold mb-2">Hallo 👋</h1>
     <p class="text-gray-600 mb-6">
       Danke, dass du diese App aufgesetzt hast. Erstelle das erste Admin-Konto, um zu beginnen.
@@ -56,6 +56,7 @@ const onSubmit = handleSubmit(async (values) => {
     <v-text-field
         v-model="name"
         type="text"
+        label="Name"
         placeholder="Name"
         :error-messages="nameError ? [nameError] : []"
         hide-details="auto"
@@ -63,6 +64,7 @@ const onSubmit = handleSubmit(async (values) => {
     <v-text-field
         v-model="email"
         type="email"
+        label="Email"
         placeholder="Email"
         :error-messages="emailError ? [emailError] : []"
         required
@@ -71,6 +73,7 @@ const onSubmit = handleSubmit(async (values) => {
     <v-text-field
         v-model="password"
         type="password"
+        label="Password"
         placeholder="Passwort (mind. 8)"
         :error-messages="passwordError ? [passwordError] : []"
         required
