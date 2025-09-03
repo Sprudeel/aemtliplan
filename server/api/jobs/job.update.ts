@@ -11,14 +11,18 @@ const Body = z.object({
 export default defineEventHandler(async (event) => {
   const { id, name, description, icon } = Body.parse(await readBody(event));
 
-  return prisma.job.update({
-    where: {
-      id: id,
-    },
-    data: {
-      name: name,
-      description: description,
-      icon: icon,
-    },
-  });
+  try {
+    return prisma.job.update({
+      where: {
+        id: id,
+      },
+      data: {
+        name: name,
+        description: description,
+        icon: icon,
+      },
+    });
+  } catch {
+    throw createError({ statusCode: 409, statusMessage: "Something went wrong..." });
+  }
 });

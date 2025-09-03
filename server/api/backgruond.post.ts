@@ -1,4 +1,3 @@
-// Takes as an input a new image file with high resolution and then uploads it to the public/ folder with the name backgruond.png
 import { readMultipartFormData } from "h3";
 import { promises as fsp } from "node:fs";
 import { join } from "node:path";

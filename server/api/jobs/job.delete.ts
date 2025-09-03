@@ -7,9 +7,14 @@ const Body = z.object({
 
 export default defineEventHandler(async (event) => {
   const { id } = Body.parse(await readBody(event));
-  return prisma.job.delete({
-    where: {
-      id: id,
-    },
-  });
+
+  try {
+    return prisma.job.delete({
+      where: {
+        id: id,
+      },
+    });
+  } catch {
+    throw createError({ statusCode: 409, statusMessage: "Something went wrong..." });
+  }
 });

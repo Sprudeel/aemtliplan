@@ -12,18 +12,22 @@ export default defineEventHandler(async (event) => {
   const { id, name, color, members } = Body.parse(await readBody(event));
   const uniqMembers = Array.from(new Set(members.filter(Boolean)));
 
-  return prisma.group.update({
-    where: {
-      id: id,
-    },
-    data: {
-      name: name,
-      color: color,
-      members: {
-        deleteMany: {},
-        create: uniqMembers.map((m) => ({ name: m })),
+  try {
+    return prisma.group.update({
+      where: {
+        id: id,
       },
-    },
-    include: { members: true },
-  });
+      data: {
+        name: name,
+        color: color,
+        members: {
+          deleteMany: {},
+          create: uniqMembers.map((m) => ({ name: m })),
+        },
+      },
+      include: { members: true },
+    });
+  } catch {
+    throw createError({ statusCode: 409, statusMessage: "Something went wrong..." });
+  }
 });

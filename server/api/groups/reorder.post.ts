@@ -19,10 +19,14 @@ export default defineEventHandler(async (event) => {
       statusMessage: "Unknown groupId in order",
     });
 
-  await prisma.$transaction(
-    order.map((id, idx) =>
-      prisma.group.update({ where: { id }, data: { rotationIndex: idx } }),
-    ),
-  );
-  return { ok: true, count: order.length };
+  try {
+    await prisma.$transaction(
+        order.map((id, idx) =>
+            prisma.group.update({ where: { id }, data: { rotationIndex: idx } }),
+        ),
+    );
+    return { ok: true, count: order.length };
+  } catch {
+    throw createError({ statusCode: 409, statusMessage: "Something went wrong..." });
+  }
 });

@@ -12,10 +12,13 @@ export default defineEventHandler(async (event) => {
     where: { groupId: id },
   });
 
-  // Create the group
-  return await prisma.group.delete({
-    where: {
-      id: id,
-    },
-  });
+  try {
+    return await prisma.group.delete({
+      where: {
+        id: id,
+      },
+    });
+  } catch {
+    throw createError({ statusCode: 409, statusMessage: "Something went wrong..." });
+  }
 });

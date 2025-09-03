@@ -10,7 +10,6 @@ const Body = z.object({
 export default defineEventHandler(async (event) => {
     const { name, description, icon } = Body.parse(await readBody(event))
 
-
     try {
         return await prisma.job.create({
             data: {
@@ -20,6 +19,6 @@ export default defineEventHandler(async (event) => {
             },
         })
     } catch {
-        throw createError({ statusCode: 409, statusMessage: 'Job already exists' })
+        throw createError({ statusCode: 409, statusMessage: 'Something went wrong...' })
     }
 })

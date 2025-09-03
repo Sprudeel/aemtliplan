@@ -13,9 +13,13 @@ export default defineEventHandler(async (event) => {
 
   const normalized = ((pointer % ringLen) + ringLen) % ringLen;
 
-  return await prisma.job.update({
-    where: { id },
-    data: { rotationPointer: normalized },
-    select: { id: true, name: true, rotationPointer: true },
-  });
+  try {
+    return await prisma.job.update({
+      where: { id },
+      data: { rotationPointer: normalized },
+      select: { id: true, name: true, rotationPointer: true },
+    });
+  } catch {
+    throw createError({ statusCode: 409, statusMessage: "Something went wrong..." });
+  }
 });
