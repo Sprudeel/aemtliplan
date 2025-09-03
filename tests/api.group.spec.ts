@@ -1,11 +1,9 @@
 import {describe, expect, test} from "vitest";
 import { createTestAgent } from './utils/http'
-import { prismaTestClient } from './utils/test-db'
 
 
 describe('POST /api/group', () => {
     const agent = createTestAgent();
-    const prisma = prismaTestClient();
     // Create a new group
     // Test that the group is created successfully
     test('Group can be created successfully', async () => {
@@ -43,7 +41,7 @@ describe('POST /api/group', () => {
 
     // Test that creating a group with a duplicate name fails
     test('Creating a group with duplicate name fails', async () => {
-        const g1 = await (await agent).post('/api/group')
+        await (await agent).post('/api/group')
             .send({
                 name: 'Gruppe Chaos',
                 members: ['Contenta', 'Gecko'],
@@ -51,7 +49,7 @@ describe('POST /api/group', () => {
             })
             .expect(200);
 
-        const g2 = await (await agent).post('/api/group')
+        await (await agent).post('/api/group')
             .send({
                 name: 'Gruppe Chaos',
                 members: ['Clever', 'Sueno'],
@@ -62,7 +60,7 @@ describe('POST /api/group', () => {
 
     // Test that creating a group with invalid data fails
     test('Creating a group with invalid data fails', async () => {
-        const g2 = await (await agent).post('/api/group')
+        await (await agent).post('/api/group')
             .send({
                 members: ['Clever', 'Sueno'],
             })
