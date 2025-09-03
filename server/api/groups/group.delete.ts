@@ -8,11 +8,11 @@ const Body = z.object({
 export default defineEventHandler(async (event) => {
   const { id } = Body.parse(await readBody(event));
 
-  prisma.member.deleteMany({
-    where: { groupId: id },
-  });
-
   try {
+    prisma.member.deleteMany({
+      where: { groupId: id },
+    });
+
     return await prisma.group.delete({
       where: {
         id: id,

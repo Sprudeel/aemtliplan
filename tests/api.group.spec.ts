@@ -1,9 +1,18 @@
-import {describe, expect, test} from "vitest";
+import {beforeAll, describe, expect, test} from "vitest";
 import { createTestAgent } from './utils/http'
+import {resetTestDatabase} from "~/tests/utils/test-db";
 
+beforeAll(
+    async () => {
+        await resetTestDatabase();
+    }
+)
+
+let id: number = 0;
 
 describe('POST /api/group', () => {
     const agent = createTestAgent();
+
     // Create a new group
     // Test that the group is created successfully
     test('Group can be created successfully', async () => {
@@ -18,11 +27,21 @@ describe('POST /api/group', () => {
         expect(res).toBeDefined();
         expect(res.body.name).toBe('Gruppe Chaos');
         expect(res.body.members.length).toBe(2);
+        id = res.body.id;
     })
+
+    // Delete the created group
+    test('Group can be deleted successfully', async () => {
+        await (await agent).delete(`/api/group/delete`).send({id})
+            .expect(200)
+
+        // Verify that the group has been deleted
+        await (await agent).get(`/api/group/get`).query({id})
+            .expect(404);
+    });
 
     // Test that the group appears in the list of groups
     test('Created group appears in the list of groups', async () => {
-
         await (await agent).post('/api/group')
             .send({
                 name: 'Gruppe Chaos',
@@ -41,14 +60,6 @@ describe('POST /api/group', () => {
 
     // Test that creating a group with a duplicate name fails
     test('Creating a group with duplicate name fails', async () => {
-        await (await agent).post('/api/group')
-            .send({
-                name: 'Gruppe Chaos',
-                members: ['Contenta', 'Gecko'],
-                color: '#C6DEF1'
-            })
-            .expect(200);
-
         await (await agent).post('/api/group')
             .send({
                 name: 'Gruppe Chaos',
