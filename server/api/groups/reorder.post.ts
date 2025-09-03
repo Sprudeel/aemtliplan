@@ -1,5 +1,6 @@
 import prisma from "~/server/utils/prisma";
 import { z } from "zod";
+import {int} from "@es-joy/jsdoccomment";
 
 const Body = z.object({ order: z.array(z.number().int()).nonempty() }); // [groupId...]
 
@@ -11,7 +12,7 @@ export default defineEventHandler(async (event) => {
         where: { id: { in: order } },
         select: { id: true },
       })
-    ).map((g) => g.id),
+    ).map((g: { id: number }) => g.id),
   );
   if (order.some((id) => !existing.has(id)))
     throw createError({
