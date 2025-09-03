@@ -1,0 +1,39 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    env:
+      DATABASE_URL: "file:./test.db"
+      NODE_ENV: test
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint code
+        run: npm run lint
+
+      - name: Generate Prisma Client
+        run: npx prisma generate
+
+      - name: Prepare test database (db push)
+        run: npx prisma db push
+
+      - name: Seed test database
+        run: npx prisma db seed
+
+      - name: Run tests
+        run: npx vitest --run
