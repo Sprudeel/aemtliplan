@@ -19,7 +19,7 @@ export default defineEventHandler(async (event) => {
                 icon,
             },
         })
-    } catch (e: any) {
+    } catch {
         throw createError({ statusCode: 409, statusMessage: 'Job already exists' })
     }
 })

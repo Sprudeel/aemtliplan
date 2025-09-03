@@ -26,7 +26,7 @@ export default defineEventHandler(async (event) => {
             },
             include: { members: true },
         })
-    } catch (e: any) {
+    } catch {
         // likely unique constraint on name
         throw createError({ statusCode: 409, statusMessage: 'Group already exists' })
     }
