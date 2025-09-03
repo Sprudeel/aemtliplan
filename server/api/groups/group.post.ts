@@ -1,6 +1,7 @@
 import prisma from '~/server/utils/prisma'
 import { z } from 'zod'
 
+
 const Body = z.object({
     name: z.string().trim().min(1, 'Name required'),
     members: z.array(z.string().trim().min(1)).min(1).max(100),
