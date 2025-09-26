@@ -4,6 +4,11 @@ export default defineNuxtConfig({
   build: {
     transpile: ["vuetify"],
   },
+  runtimeConfig: {
+    public: {
+      rotationCron: process.env.NUXT_PUBLIC_ROTATION_CRON || "0 7 * * MON",
+    },
+  },
   modules: [
     "@nuxtjs/tailwindcss",
     (_options, nuxt) => {
