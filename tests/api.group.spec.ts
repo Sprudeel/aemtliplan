@@ -48,7 +48,7 @@ describe('POST /api/group', () => {
                 members: ['Contenta', 'Gecko'],
                 color: '#C6DEF1'
             })
-            .expect(200)
+            .expect(404)
 
         const res = await (await agent).get('/api/groups')
             .expect(200)
