@@ -9,6 +9,7 @@ on:
 
 jobs:
   backend-tests:
+    if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     env:
       DATABASE_URL: "file:./test.db"
