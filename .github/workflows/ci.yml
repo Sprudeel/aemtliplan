@@ -8,7 +8,7 @@ on:
 
 
 jobs:
-  test:
+  backend-tests:
     runs-on: ubuntu-latest
     env:
       DATABASE_URL: "file:./test.db"
