@@ -274,7 +274,6 @@ const lastUpdatedLabel = compactFormatter.format(generatedAt)
                       </div>
                     </div>
                   </div>
-
                   <template #append>
                     <div class="rotation-flow">
                       <div class="rotation-flow__stage">
