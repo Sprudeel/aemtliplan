@@ -4,7 +4,7 @@ import { PrismaClient } from "@prisma/client";
 import fs from "node:fs";
 import path from "node:path";
 
-const lockout = 20_000;
+const lockout = 30_000;
 const DEFAULT_DB_URL = "file:./test.db";
 
 function resolveSqlitePath(dbUrl: string) {

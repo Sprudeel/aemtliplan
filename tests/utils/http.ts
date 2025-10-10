@@ -94,7 +94,6 @@ export function createTestAgent() {
       });
     }),
   );
-  app.use("/api/user", eventHandler(userGet));
   app.use(
     "/api/users/users",
     eventHandler((event) => {
@@ -115,6 +114,7 @@ export function createTestAgent() {
       });
     }),
   );
+  app.use("/api/user", eventHandler(userGet));
 
   const listener = toNodeListener(app);
   return supertest.agent(listener);
