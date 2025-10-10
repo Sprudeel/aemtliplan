@@ -4,12 +4,10 @@ export default defineNuxtConfig({
   build: {
     transpile: ["vuetify"],
   },
-  runtimeConfig: {
-    public: {
-      rotationCron: process.env.NUXT_PUBLIC_ROTATION_CRON || "0 7 * * MON",
-    },
-  },
+    security: {},
+  runtimeConfig: {},
   modules: [
+      "nuxt-security",
     "@nuxtjs/tailwindcss",
     (_options, nuxt) => {
       nuxt.hooks.hook("vite:extendConfig", (config) => {
