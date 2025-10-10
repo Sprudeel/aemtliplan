@@ -25,6 +25,15 @@ async function main() {
     },
   });
 
+    await prisma.user.create({
+        data: {
+            email: "sprudel@example.com",
+            name: "Sprudel",
+            password: password,
+            role: "ADMIN",
+        },
+    });
+
   // Gruppen mit rotationIndex (Ring)
   const groups = await prisma.$transaction([
     prisma.group.create({
