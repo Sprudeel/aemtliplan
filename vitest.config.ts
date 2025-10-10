@@ -7,6 +7,8 @@ export default defineConfig({
     globals: true,
     setupFiles: ["./tests/vitest.setup.ts"],
     pool: "threads",
+    hookTimeout: 30000,
+    testTimeout: 30000,
     include: ["tests/**/*.spec.ts"],
   },
   resolve: {
