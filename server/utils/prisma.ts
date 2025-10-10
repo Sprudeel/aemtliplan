@@ -15,13 +15,16 @@ const prisma =
 
 // Optional: set SQLite pragmas once (safe to keep — improves concurrency)
 async function init() {
-    try {
-        await prisma.$executeRaw`PRAGMA journal_mode = WAL;`
-        await prisma.$executeRaw`PRAGMA busy_timeout = 5000;`
-    } catch (err) {
-        // Ignore if not SQLite or pragmas already set
-        console.warn("Skipping SQLite pragmas:", err instanceof Error ? err.message : err)
-    }
+  try {
+    await prisma.$executeRaw`PRAGMA journal_mode = WAL;`;
+    await prisma.$executeRaw`PRAGMA busy_timeout = 5000;`;
+  } catch (err) {
+    // Ignore if not SQLite or pragmas already set
+    console.warn(
+      "Skipping SQLite pragmas:",
+      err instanceof Error ? err.message : err,
+    );
+  }
 }
 // init();
 

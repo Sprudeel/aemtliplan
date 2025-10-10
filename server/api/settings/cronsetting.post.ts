@@ -3,7 +3,7 @@ import { Cron } from "croner";
 import prisma from "~/server/utils/prisma";
 import { requireUser } from "~/server/utils/auth";
 import { syncRotationSchedule } from "~/server/services/rotationScheduler";
-import { DEFAULT_ROTATION_CRON } from '~/server/utils/rotation'
+import { DEFAULT_ROTATION_CRON } from "~/server/utils/rotation";
 
 const Body = z.object({
   cron: z.string().optional(),

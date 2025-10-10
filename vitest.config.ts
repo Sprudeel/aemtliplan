@@ -6,6 +6,7 @@ export default defineConfig({
     environment: "node",
     globals: true,
     setupFiles: ["./tests/vitest.setup.ts"],
+    pool: "threads",
     include: ["tests/**/*.spec.ts"],
   },
   resolve: {

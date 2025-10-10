@@ -4,10 +4,10 @@ export default defineNuxtConfig({
   build: {
     transpile: ["vuetify"],
   },
-    security: {},
+  security: {},
   runtimeConfig: {},
   modules: [
-      "nuxt-security",
+    "nuxt-security",
     "@nuxtjs/tailwindcss",
     (_options, nuxt) => {
       nuxt.hooks.hook("vite:extendConfig", (config) => {
