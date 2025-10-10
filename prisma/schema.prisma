@@ -37,6 +37,7 @@ model Group {
   name          String   @unique
   color         String   @default("#000000")
   rotationIndex Int      @unique // position in the single rotation ring (0..N-1)
+  inRotation    Boolean  @default(true)
   members       Member[]
   createdAt     DateTime @default(now())
 
@@ -60,8 +61,7 @@ model Job {
   description     String?
   createdAt       DateTime @default(now())
 
-  current    GroupJob?
-  placements JobPlacement[]
+  current GroupJob?
 }
 
 model GroupJob {
@@ -77,15 +77,8 @@ model GroupJob {
   @@unique([groupId, jobId])
 }
 
-model JobPlacement {
-  id      Int @id @default(autoincrement())
-  jobId   Int
-  row     Int @default(1)
-  col     Int @default(1)
-  rowSpan Int @default(1)
-  colSpan Int @default(1)
-
-  job Job @relation(fields: [jobId], references: [id], onDelete: Cascade)
-
-  @@unique([jobId])
+model Setting {
+  key       String   @id
+  value     String
+  updatedAt DateTime @updatedAt
 }

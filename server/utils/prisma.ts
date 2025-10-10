@@ -1,29 +1,35 @@
-import { PrismaClient } from '@prisma/client'
+import { PrismaClient } from "@prisma/client";
 
 declare global {
-    // eslint-disable-next-line no-var
-    var __prisma: PrismaClient | undefined
+  var __prisma: PrismaClient | undefined;
 }
 
 const prisma =
-    globalThis.__prisma ??
-    new PrismaClient({
-        log: process.env.NODE_ENV === 'development' ? ['query', 'error', 'warn'] : ['error'],
-    })
+  globalThis.__prisma ??
+  new PrismaClient({
+    log:
+      process.env.NODE_ENV === "development"
+        ? ["query", "error", "warn"]
+        : ["error"],
+  });
 
-// Optional: set SQLite pragmas once (safe to keep — quick & improves concurrency)
+// Optional: set SQLite pragmas once (safe to keep — improves concurrency)
 async function init() {
-    try {
-        await prisma.$executeRawUnsafe('PRAGMA journal_mode=WAL;')
-        await prisma.$executeRawUnsafe('PRAGMA busy_timeout=5000;')
-    } catch {
-        // ignore if not SQLite / or already set
-    }
+  try {
+    await prisma.$executeRaw`PRAGMA journal_mode = WAL;`;
+    await prisma.$executeRaw`PRAGMA busy_timeout = 5000;`;
+  } catch (err) {
+    // Ignore if not SQLite or pragmas already set
+    console.warn(
+      "Skipping SQLite pragmas:",
+      err instanceof Error ? err.message : err,
+    );
+  }
 }
-init()
+// init();
 
-if (process.env.NODE_ENV !== 'production') {
-    globalThis.__prisma = prisma
+if (process.env.NODE_ENV !== "production") {
+  globalThis.__prisma = prisma;
 }
 
-export default prisma
+export default prisma;

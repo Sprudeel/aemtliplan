@@ -1,13 +1,37 @@
-import prisma from '~/server/utils/prisma'
-import { z } from 'zod'
+import { z } from "zod";
+import { requireUser } from "~/server/utils/auth";
+import prisma from "~/server/utils/prisma";
 
-const Body = z.object({ order: z.array(z.number().int()).nonempty() }) // [groupId...]
+const Body = z.object({ order: z.array(z.number().int()).nonempty() }); // [groupId...]
 
 export default defineEventHandler(async (event) => {
-    const { order } = Body.parse(await readBody(event))
-    const existing = new Set((await prisma.group.findMany({ where: { id: { in: order } }, select: { id: true } })).map(g => g.id))
-    if (order.some(id => !existing.has(id))) throw createError({ statusCode: 400, statusMessage: 'Unknown groupId in order' })
+  await requireUser(event);
+  const { order } = Body.parse(await readBody(event));
+  const existing = new Set(
+    (
+      await prisma.group.findMany({
+        where: { id: { in: order } },
+        select: { id: true },
+      })
+    ).map((g: { id: number }) => g.id),
+  );
+  if (order.some((id) => !existing.has(id)))
+    throw createError({
+      statusCode: 400,
+      statusMessage: "Unknown groupId in order",
+    });
 
-    await prisma.$transaction(order.map((id, idx) => prisma.group.update({ where: { id }, data: { rotationIndex: idx } })))
-    return { ok: true, count: order.length }
-})
+  try {
+    await prisma.$transaction(
+      order.map((id, idx) =>
+        prisma.group.update({ where: { id }, data: { rotationIndex: idx } }),
+      ),
+    );
+    return { ok: true, count: order.length };
+  } catch {
+    throw createError({
+      statusCode: 409,
+      statusMessage: "Something went wrong...",
+    });
+  }
+});
