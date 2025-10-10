@@ -1,22 +1,26 @@
 import { PrismaClient } from "@prisma/client";
+import bcrypt from "bcryptjs";
 
 const prisma = new PrismaClient();
 
 async function main() {
-  await prisma.jobPlacement.deleteMany();
   await prisma.groupJob.deleteMany();
   await prisma.member.deleteMany();
   await prisma.group.deleteMany();
   await prisma.job.deleteMany();
   await prisma.session.deleteMany();
   await prisma.user.deleteMany();
+  await prisma.setting.deleteMany();
+
+  // bcrypt hash for password
+  const password: string = await bcrypt.hash("password", 12);
 
   // User (Admin)
   await prisma.user.create({
     data: {
       email: "admin@example.com",
       name: "Admin",
-      password: "password",
+      password: password,
       role: "ADMIN",
     },
   });
@@ -24,31 +28,44 @@ async function main() {
   // Gruppen mit rotationIndex (Ring)
   const groups = await prisma.$transaction([
     prisma.group.create({
-      data: { name: "Gruppe 1", rotationIndex: 0, color: "#C9E4DE" },
+      data: {
+        name: "Gruppe 1",
+        rotationIndex: 0,
+        color: "#A81B00",
+        inRotation: true,
+      },
     }),
     prisma.group.create({
-      data: { name: "Gruppe 2", rotationIndex: 1, color: "#C6DEF1" },
+      data: {
+        name: "Gruppe 2",
+        rotationIndex: 1,
+        color: "#A88100",
+        inRotation: true,
+      },
     }),
     prisma.group.create({
-      data: { name: "Gruppe 3", rotationIndex: 2, color: "#FAEDCB" },
+      data: {
+        name: "Gruppe 3",
+        rotationIndex: 2,
+        color: "#00A819",
+        inRotation: true,
+      },
     }),
     prisma.group.create({
-      data: { name: "Gruppe 4", rotationIndex: 3, color: "#FAEDCB" },
+      data: {
+        name: "Gruppe 4",
+        rotationIndex: 3,
+        color: "#0014A8",
+        inRotation: true,
+      },
     }),
     prisma.group.create({
-      data: { name: "Gruppe 5", rotationIndex: 4, color: "#FAEDCB" },
-    }),
-    prisma.group.create({
-      data: { name: "Gruppe 6", rotationIndex: 5, color: "#FAEDCB" },
-    }),
-    prisma.group.create({
-      data: { name: "Gruppe 7", rotationIndex: 6, color: "#FAEDCB" },
-    }),
-    prisma.group.create({
-      data: { name: "Gruppe 8", rotationIndex: 7, color: "#FAEDCB" },
-    }),
-    prisma.group.create({
-      data: { name: "Gruppe 9", rotationIndex: 8, color: "#FAEDCB" },
+      data: {
+        name: "Gruppe 5",
+        rotationIndex: 4,
+        color: "#A8009A",
+        inRotation: true,
+      },
     }),
   ]);
 
@@ -63,10 +80,7 @@ async function main() {
       { name: "Sprudel", groupId: groups[2].id },
       { name: "Contenta", groupId: groups[3].id },
       { name: "Gecko", groupId: groups[3].id },
-      { name: "Clever", groupId: groups[7].id },
       { name: "Sueno", groupId: groups[4].id },
-      { name: "Xanadu", groupId: groups[5].id },
-      { name: "Sprudel", groupId: groups[6].id },
     ],
   });
 
@@ -112,38 +126,6 @@ async function main() {
         rotationPointer: 4,
       },
     }),
-    prisma.job.create({
-      data: {
-        name: "Testing4",
-        icon: "🧹",
-        description: "Putzen & Tische ordnen",
-        rotationPointer: 5,
-      },
-    }),
-    prisma.job.create({
-      data: {
-        name: "Testing5",
-        icon: "🧹",
-        description: "Putzen & Tische ordnen",
-        rotationPointer: 6,
-      },
-    }),
-    prisma.job.create({
-      data: {
-        name: "Testing6",
-        icon: "🧹",
-        description: "Putzen & Tische ordnen",
-        rotationPointer: 7,
-      },
-    }),
-    prisma.job.create({
-      data: {
-        name: "Testing7",
-        icon: "🧹",
-        description: "Putzen & Tische ordnen",
-        rotationPointer: 8,
-      },
-    }),
   ]);
 
   // Aktuelle Zuordnungen (GroupJob) nach rotationPointer
@@ -164,15 +146,6 @@ async function main() {
       });
     }),
   );
-
-  // Platzierungen fürs UI (JobPlacement)
-  await prisma.jobPlacement.createMany({
-    data: [
-      { jobId: jobs[0].id, row: 1, col: 1 },
-      { jobId: jobs[1].id, row: 1, col: 2 },
-      { jobId: jobs[2].id, row: 2, col: 1, colSpan: 2 },
-    ],
-  });
 
   console.log("🌱 Seed complete");
   console.log("Admin login: admin@example.com / password");
