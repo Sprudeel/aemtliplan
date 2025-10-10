@@ -1,4 +1,5 @@
 import prisma from "~/server/utils/prisma";
+
 export default defineEventHandler(async (event) => {
   const token = getCookie(event, "sid");
   if (token)

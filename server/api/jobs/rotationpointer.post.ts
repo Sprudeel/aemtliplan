@@ -1,9 +1,11 @@
-import prisma from "~/server/utils/prisma";
 import { z } from "zod";
+import { requireUser } from "~/server/utils/auth";
+import prisma from "~/server/utils/prisma";
 
 const Body = z.object({ pointer: z.number().int() });
 
 export default defineEventHandler(async (event) => {
+  await requireUser(event);
   const id = Number(getRouterParam(event, "id"));
   const { pointer } = Body.parse(await readBody(event));
 
@@ -20,6 +22,9 @@ export default defineEventHandler(async (event) => {
       select: { id: true, name: true, rotationPointer: true },
     });
   } catch {
-    throw createError({ statusCode: 409, statusMessage: "Something went wrong..." });
+    throw createError({
+      statusCode: 409,
+      statusMessage: "Something went wrong...",
+    });
   }
 });

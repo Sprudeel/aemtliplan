@@ -1,8 +1,10 @@
+import { requireUser } from "~/server/utils/auth";
 import prisma from "~/server/utils/prisma";
 
-export default defineEventHandler(async () => {
+export default defineEventHandler(async (event) => {
+  await requireUser(event);
   const [groups, jobs, assigned] = await Promise.all([
-    prisma.group.findMany({ orderBy: { rotationIndex: "asc" } }),
+    prisma.group.findMany({ orderBy: { name: "asc" } }),
     prisma.job.findMany({ orderBy: { name: "asc" } }),
     prisma.groupJob.findMany({ select: { jobId: true } }),
   ]);
