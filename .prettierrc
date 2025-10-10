@@ -1,0 +1,14 @@
+{
+  "singleQuote": false,
+  "tabWidth": 2,
+  "overrides": [
+    {
+      "files": ["*.js", "*.jsx", "*.ts", "*.tsx"],
+      "options": { "semi": true }
+    },
+    {
+      "files": "*.vue",
+      "options": { "semi": false }
+    }
+  ]
+}
