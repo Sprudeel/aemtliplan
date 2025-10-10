@@ -1,4 +1,5 @@
 import prisma from "~/server/utils/prisma";
+import { getCookie, deleteCookie } from "h3";
 
 export default defineEventHandler(async (event) => {
   const token = getCookie(event, "sid");
