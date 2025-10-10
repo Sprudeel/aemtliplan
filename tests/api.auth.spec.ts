@@ -163,7 +163,6 @@ describe("Users API", () => {
   };
   const readUserList = (res: Response) => {
     const raw = Array.isArray(res.body) ? res.body : JSON.parse(res.text ?? "[]");
-    console.log(raw);
     if (!Array.isArray(raw)) {
       throw new Error("Expected Users API to return an array");
     }
