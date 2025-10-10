@@ -1,24 +1,26 @@
 import { beforeAll, describe, expect, test, vi } from "vitest";
-import type { SuperAgentTest } from "supertest";
+import type { Response, SuperAgentTest } from "supertest";
 
 import { createTestAgent } from "./utils/http";
 import { resetTestDatabase } from "~/tests/utils/test-db";
 import { DEFAULT_ROTATION_CRON } from "~/server/utils/rotation";
 
-const runtimeConfig = vi.hoisted(() => ({ public: { rotationCron: "" } }));
+type ApiUser = {
+  id: number;
+  email: string;
+  name: string | null;
+  role: string;
+  createdAt: string;
+};
+
 const rotationMocks = vi.hoisted(() => ({
   syncRotationScheduleMock: vi.fn(),
 }));
 
-vi.mock("#imports", () => ({
-  useRuntimeConfig: () => runtimeConfig,
-}));
 
 vi.mock("~/server/services/rotationScheduler", () => ({
   syncRotationSchedule: rotationMocks.syncRotationScheduleMock,
 }));
-
-runtimeConfig.public.rotationCron = DEFAULT_ROTATION_CRON;
 
 let adminAgent: SuperAgentTest;
 let adminUserId: number;
@@ -159,6 +161,14 @@ describe("Users API", () => {
     email: "delete.me@example.com",
     password: "deletePass1",
   };
+  const readUserList = (res: Response) => {
+    const raw = Array.isArray(res.body) ? res.body : JSON.parse(res.text ?? "[]");
+    console.log(raw);
+    if (!Array.isArray(raw)) {
+      throw new Error("Expected Users API to return an array");
+    }
+    return raw as ApiUser[];
+  };
 
   beforeAll(async () => {
     // ensure admin session is active
@@ -196,9 +206,10 @@ describe("Users API", () => {
 
   test("Admin can list all users", async () => {
     const res = await adminAgent.get("/api/users/users").expect(200);
-    expect(Array.isArray(res.body)).toBe(true);
+    const users = readUserList(res);
+    expect(users.length).toBeGreaterThanOrEqual(2);
 
-    const emails = res.body.map((user: any) => user.email);
+    const emails = users.map((user) => user.email);
     expect(emails).toEqual(
       expect.arrayContaining([
         "admin@example.com",
@@ -208,6 +219,13 @@ describe("Users API", () => {
     if (registeredUser.email) {
       expect(emails).toContain(registeredUser.email);
     }
+
+    const requiredProps = ["id", "email", "name", "role", "createdAt"];
+    users.forEach((user) => {
+      requiredProps.forEach((prop) => {
+        expect(user).toHaveProperty(prop);
+      });
+    });
   });
 
   test("Non-admin users cannot list all users", async () => {
@@ -228,7 +246,7 @@ describe("Users API", () => {
       .expect(200);
 
     const list = await adminAgent.get("/api/users/users").expect(200);
-    const emails = list.body.map((user: any) => user.email);
+    const emails = readUserList(list).map((user) => user.email);
     expect(emails).not.toContain(deleteUser.email);
 
     const agent = createTestAgent() as unknown as SuperAgentTest;

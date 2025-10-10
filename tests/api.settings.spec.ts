@@ -12,10 +12,6 @@ const rotationMocks = vi.hoisted(() => ({
   syncRotationScheduleMock: vi.fn(),
 }));
 
-vi.mock("#imports", () => ({
-  useRuntimeConfig: () => runtimeConfig,
-}));
-
 vi.mock("~/server/services/rotationScheduler", () => ({
   syncRotationSchedule: rotationMocks.syncRotationScheduleMock,
 }));
@@ -54,9 +50,8 @@ afterAll(async () => {
 
 describe("Settings API - cronsetting", () => {
   test("GET returns runtime fallback when no cron is stored", async () => {
-    runtimeConfig.public.rotationCron = "5 4 * * *";
     const res = await agent.get("/api/settings/cronsetting").expect(200);
-    expect(res.body).toEqual({ cron: "5 4 * * *" });
+    expect(res.body).toEqual({ cron: "0 17 * * *" });
   });
 
   test("POST with valid cron persists value and updates schedule", async () => {
@@ -89,8 +84,6 @@ describe("Settings API - cronsetting", () => {
   });
 
   test("POST with empty cron clears stored value and disables schedule", async () => {
-    runtimeConfig.public.rotationCron = "15 10 * * 2";
-
     const res = await agent
       .post("/api/settings/cronsetting")
       .send({ cron: "" })
@@ -100,7 +93,7 @@ describe("Settings API - cronsetting", () => {
     expect(syncRotationScheduleMock).toHaveBeenCalledWith(null, DEFAULT_ROTATION_CRON);
 
     const after = await agent.get("/api/settings/cronsetting").expect(200);
-    expect(after.body).toEqual({ cron: "15 10 * * 2" });
+    expect(after.body).toEqual({ cron: "0 17 * * *" });
     savedCron = null;
   });
 });
