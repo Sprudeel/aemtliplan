@@ -1,84 +1,263 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "sqlite"
-  url      = "file:./dev.db"
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
+// ---------------------------------------------------------------------------
+// better-auth tables (accounts, sessions, plans = organizations).
+// Field names must match better-auth; see server/utils/auth.ts.
+// ---------------------------------------------------------------------------
+
 model User {
-  id        Int       @id @default(autoincrement())
-  email     String    @unique
-  name      String
-  password  String
-  role      String
-  sessions  Session[]
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  id            String    @id
+  name          String
+  email         String    @unique
+  emailVerified Boolean   @default(false)
+  image         String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @default(now()) @updatedAt
+
+  sessions    Session[]
+  accounts    Account[]
+  memberships PlanMembership[]
+  invitations PlanInvitation[]
+  members     Member[]
+  rotations   RotationLog[]
+
+  @@map("user")
 }
 
 model Session {
-  id        String   @id
-  userId    Int
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  createdAt DateTime @default(now())
-  expiresAt DateTime
+  id                   String   @id
+  expiresAt            DateTime
+  token                String   @unique
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+  ipAddress            String?
+  userAgent            String?
+  userId               String
+  activeOrganizationId String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
-  @@index([expiresAt])
+  @@map("session")
+}
+
+/// Login methods of a user: "credential" (password) or an OAuth provider such as "midata".
+model Account {
+  id                    String    @id
+  accountId             String
+  providerId            String
+  userId                String
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("account")
+}
+
+/// Short-lived tokens: email verification, password reset.
+model Verification {
+  id         String   @id
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @default(now()) @updatedAt
+
+  @@index([identifier])
+  @@map("verification")
+}
+
+/// One Ämtliplan, usually one camp. better-auth "organization".
+model Plan {
+  id        String   @id
+  name      String
+  slug      String   @unique
+  logo      String?
+  createdAt DateTime
+  metadata  String?
+
+  memberships PlanMembership[]
+  invitations PlanInvitation[]
+  settings    PlanSettings?
+  groups      Group[]
+  members     Member[]
+  jobs        Job[]
+  assignments Assignment[]
+  rotations   RotationLog[]
+
+  @@map("plan")
+}
+
+/// Who may access a plan. role: "owner" | "admin" (= Admin) | "member" (= Viewer).
+model PlanMembership {
+  id             String   @id
+  organizationId String
+  userId         String
+  role           String   @default("member")
+  createdAt      DateTime
+
+  plan Plan @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId])
+  @@index([userId])
+  @@map("plan_membership")
+}
+
+model PlanInvitation {
+  id             String   @id
+  organizationId String
+  email          String
+  role           String?
+  status         String   @default("pending")
+  expiresAt      DateTime
+  createdAt      DateTime @default(now())
+  inviterId      String
+
+  plan    Plan @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  inviter User @relation(fields: [inviterId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId])
+  @@index([email])
+  @@map("plan_invitation")
+}
+
+// ---------------------------------------------------------------------------
+// Ämtliplan domain. Every row belongs to exactly one plan.
+// ---------------------------------------------------------------------------
+
+enum IdlePolicy {
+  slots // only Ämtli slots rotate; groups without a slot stay idle
+  fair // idle groups take turns (one "bench" slot per idle group)
+}
+
+enum Visibility {
+  private
+  public
+}
+
+enum RotationTrigger {
+  manual
+  schedule
+  undo
+}
+
+model PlanSettings {
+  planId               String     @id
+  timezone             String     @default("Europe/Zurich")
+  rotationEnabled      Boolean    @default(false)
+  rotationTime         String     @default("17:00") // HH:mm, daily, in `timezone`
+  nextRotationAt       DateTime?
+  idlePolicy           IdlePolicy @default(slots)
+  visibility           Visibility @default(private)
+  publicSlug           String     @unique // random, used in /api/public/:slug
+  showMemberNames      Boolean    @default(false)
+  memberLogin          Boolean    @default(false)
+  backgroundKey        String?
+  midataEventId        String?
+  assignmentsChangedAt DateTime   @default(now())
+  updatedAt            DateTime   @updatedAt
+
+  plan Plan @relation(fields: [planId], references: [id], onDelete: Cascade)
+
+  @@index([rotationEnabled, nextRotationAt])
 }
 
 model Group {
-  id            Int      @id @default(autoincrement())
-  name          String   @unique
-  color         String   @default("#000000")
-  rotationIndex Int      @unique // position in the single rotation ring (0..N-1)
-  inRotation    Boolean  @default(true)
-  members       Member[]
-  createdAt     DateTime @default(now())
+  id         Int       @id @default(autoincrement())
+  planId     String
+  name       String
+  color      String    @default("#000000")
+  inRotation Boolean   @default(true)
+  idleSince  DateTime? // set while the group is in rotation but has no Ämtli
+  createdAt  DateTime  @default(now())
 
-  assignments GroupJob[]
+  plan        Plan         @relation(fields: [planId], references: [id], onDelete: Cascade)
+  members     Member[]
+  assignments Assignment[]
+
+  @@unique([planId, name])
 }
 
+/// A person in a group. Unique per plan, so nobody is in two groups.
 model Member {
-  id      Int    @id @default(autoincrement())
-  name    String
-  groupId Int
-  group   Group  @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  id          Int     @id @default(autoincrement())
+  planId      String
+  groupId     Int
+  name        String
+  userId      String? // set once the person logs in (member login)
+  inviteEmail String? // pending invitation, linked on first visit of /me
 
-  @@unique([groupId, name])
-}
-
-model Job {
-  id              Int      @id @default(autoincrement())
-  name            String   @unique
-  icon            String?
-  rotationPointer Int      @default(0) // job’s position within the ring
-  description     String?
-  createdAt       DateTime @default(now())
-
-  current GroupJob?
-}
-
-model GroupJob {
-  id        Int      @id @default(autoincrement())
-  groupId   Int
-  jobId     Int      @unique
-  createdAt DateTime @default(now())
-
+  plan  Plan  @relation(fields: [planId], references: [id], onDelete: Cascade)
   group Group @relation(fields: [groupId], references: [id], onDelete: Cascade)
-  job   Job   @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  user  User? @relation(fields: [userId], references: [id], onDelete: SetNull)
 
-  // prevent duplicate pairings
-  @@unique([groupId, jobId])
+  @@unique([planId, name])
+  @@index([groupId])
 }
 
-model Setting {
-  key       String   @id
-  value     String
+/// Ämtli. `position` is the place in the rotation ring (0..n-1).
+model Job {
+  id          Int      @id @default(autoincrement())
+  planId      String
+  name        String
+  icon        String?
+  description String?
+  position    Int
+  createdAt   DateTime @default(now())
+
+  plan       Plan        @relation(fields: [planId], references: [id], onDelete: Cascade)
+  assignment Assignment?
+
+  @@unique([planId, name])
+  @@index([planId, position])
+}
+
+/// Which group currently does which Ämtli. One group per Ämtli.
+model Assignment {
+  id        Int      @id @default(autoincrement())
+  planId    String
+  jobId     Int      @unique
+  groupId   Int
   updatedAt DateTime @updatedAt
+
+  plan  Plan  @relation(fields: [planId], references: [id], onDelete: Cascade)
+  job   Job   @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  group Group @relation(fields: [groupId], references: [id], onDelete: Cascade)
+
+  @@index([planId])
+  @@index([groupId])
+}
+
+/// History of rotations. before/after: [{ jobId, groupId | null }] in ring order.
+model RotationLog {
+  id       Int             @id @default(autoincrement())
+  planId   String
+  at       DateTime        @default(now())
+  trigger  RotationTrigger
+  byUserId String?
+  before   Json
+  after    Json
+  undoneAt DateTime?
+
+  plan Plan  @relation(fields: [planId], references: [id], onDelete: Cascade)
+  by   User? @relation(fields: [byUserId], references: [id], onDelete: SetNull)
+
+  @@index([planId, id])
 }

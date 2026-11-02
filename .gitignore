@@ -24,6 +24,11 @@ logs
 !.env.example
 
 # Prisma
-prisma/migrations
 prisma/dev.db
 prisma/dev.db-journal
+# Uploaded files (local storage driver)
+.data
+.output-test
+
+# Old SQLite migrations, kept locally for reference only
+prisma/migrations-sqlite-legacy
