@@ -18,6 +18,9 @@ export default [
     ignores: [
       ".nuxt/**",
       ".output/**",
+      ".output-test/**",
+      ".data/**",
+      "prisma/migrations-sqlite-legacy/**",
       "node_modules/**",
       "dist/**",
       ".vercel/**",

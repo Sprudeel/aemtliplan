@@ -1,0 +1,17 @@
+# Local Postgres for development and tests.
+# Dev DB: aemtliplan, test DB: aemtliplan_test (created by docker/init-test-db.sql).
+services:
+  db:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_USER: aemtliplan
+      POSTGRES_PASSWORD: aemtliplan
+      POSTGRES_DB: aemtliplan
+    ports:
+      - "5433:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./docker/init-test-db.sql:/docker-entrypoint-initdb.d/init-test-db.sql:ro
+
+volumes:
+  pgdata:
