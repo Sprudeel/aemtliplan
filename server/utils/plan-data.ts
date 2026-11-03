@@ -1,5 +1,6 @@
 import { randomBytes } from "node:crypto";
 import type { Group, Job, Member, PlanSettings, Prisma, PrismaClient } from "@prisma/client";
+import { isUniqueViolation } from "./errors";
 import { emitPlanChanged, type PlanChange } from "./plan-events";
 import prisma from "./prisma";
 import { fillFirstFreeSlot, type Slot } from "./rotation-engine";
@@ -12,11 +13,15 @@ export type Db = PrismaClient | Prisma.TransactionClient;
 export async function ensurePlanSettings(planId: string, db: Db = prisma): Promise<PlanSettings> {
   const existing = await db.planSettings.findUnique({ where: { planId } });
   if (existing) return existing;
-  return db.planSettings.upsert({
-    where: { planId },
-    update: {},
-    create: { planId, publicSlug: randomBytes(12).toString("base64url") },
-  });
+  try {
+    return await db.planSettings.create({
+      data: { planId, publicSlug: randomBytes(12).toString("base64url") },
+    });
+  } catch (error) {
+    // Two requests for a brand-new plan can race here; the other one created the row.
+    if (isUniqueViolation(error)) return db.planSettings.findUniqueOrThrow({ where: { planId } });
+    throw error;
+  }
 }
 
 /** Serializes rotations, undo and manual assignment changes of one plan. */

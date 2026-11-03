@@ -98,6 +98,7 @@ describe("public view", () => {
     const hidden = await anon.get(`/api/public/${slug}`);
     expect(hidden.status).toBe(200);
     expect(hidden.body.items[0]).toEqual({
+      key: expect.stringMatching(/^job:\d+$/),
       job: { name: "Ämtli 1", icon: "🧹", description: null },
       group: { name: "Gruppe 1", color: "#112233" },
     });

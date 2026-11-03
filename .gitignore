@@ -32,3 +32,7 @@ prisma/dev.db-journal
 
 # Old SQLite migrations, kept locally for reference only
 prisma/migrations-sqlite-legacy
+
+# Playwright
+test-results
+playwright-report
