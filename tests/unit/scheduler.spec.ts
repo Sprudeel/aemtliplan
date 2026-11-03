@@ -65,3 +65,13 @@ describe("runDueRotations", () => {
     expect(await prisma.rotationLog.count({ where: { planId: disabled.planId } })).toBe(0);
   });
 });
+
+describe("ensurePlanSettings", () => {
+  test("parallel first calls for a new plan create exactly one row", async () => {
+    const planId = randomUUID();
+    await prisma.plan.create({ data: { id: planId, name: "Neu", slug: `n-${planId}`, createdAt: new Date() } });
+    const results = await Promise.all(Array.from({ length: 8 }, () => ensurePlanSettings(planId)));
+    expect(new Set(results.map((settings) => settings.publicSlug)).size).toBe(1);
+    expect(await prisma.planSettings.count({ where: { planId } })).toBe(1);
+  });
+});

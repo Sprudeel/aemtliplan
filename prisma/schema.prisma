@@ -171,6 +171,8 @@ model PlanSettings {
   memberLogin          Boolean    @default(false)
   backgroundKey        String?
   midataEventId        String?
+  /// Wall designer document (shared/wall-design.ts); null = defaults
+  wallDesign           Json?
   assignmentsChangedAt DateTime   @default(now())
   updatedAt            DateTime   @updatedAt
 

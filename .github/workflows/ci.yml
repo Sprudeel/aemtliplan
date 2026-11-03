@@ -35,7 +35,7 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v5
         with:
-          node-version: "22"
+          node-version-file: ".nvmrc"
           cache: "npm"
 
       - name: Install dependencies
@@ -47,6 +47,14 @@ jobs:
       - name: Run tests (migrates the test DB, builds and starts the server)
         run: npm test
 
+      - name: Install Playwright browser
+        run: npx playwright install --with-deps chromium
+
+      - name: End-to-end tests (reuses the test build from the previous step)
+        run: npm run test:e2e
+        env:
+          SKIP_BUILD: "1"
+
   lint:
     runs-on: ubuntu-latest
     steps:
@@ -56,7 +64,7 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v5
         with:
-          node-version: "22"
+          node-version-file: ".nvmrc"
           cache: "npm"
 
       - name: Install dependencies

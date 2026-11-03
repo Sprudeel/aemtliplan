@@ -1,12 +1,16 @@
 # Ämtliplan
 
-Chore rotation (Ämtli) for scout camps. Nuxt 3 + Nitro API, better-auth, Prisma, Postgres.
+Chore rotation (Ämtli) for scout camps. Nuxt 4 + Nuxt UI (Dashboard Template), Nitro API,
+better-auth, Prisma, Postgres. UI in German, French and Italian.
 
-> Status: API v2 is done (multi-camp plans, roles, rotation log/undo, daily schedule,
-> public view, MiData login). The admin UI is still the old Vuetify app and does not
-> talk to the new API yet; it is rebuilt with Nuxt UI in the next phase.
+Features: multi-camp plans with admin/viewer roles, planner with drag & drop, daily
+automatic rotation with history and undo, MiData login and camp import, and a public
+wall view with a wall designer (free placement per screen size, card styles,
+backgrounds, widgets).
 
 ## Setup
+
+Needs Node 24 (`.nvmrc`; with nvm: `nvm use`) and Docker.
 
 ```bash
 cp .env.example .env          # then set BETTER_AUTH_SECRET (openssl rand -base64 32)
@@ -24,8 +28,11 @@ npm run dev
 and set `AUTH_RATE_LIMIT="off"` and `ROTATION_SCHEDULER="off"`.
 
 ```bash
-npm test            # unit + API tests (API tests build and start the real server)
-npm run test:unit   # fast, no build
+npm test                       # unit + component + API tests (API tests build and start the real server)
+npm run test:unit              # fast, no build
+npm run test:nuxt              # Vue components in a Nuxt environment
+npx playwright install chromium   # once
+npm run test:e2e               # browser end-to-end tests (Playwright)
 npm run typecheck
 ```
 

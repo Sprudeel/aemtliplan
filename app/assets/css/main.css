@@ -1,0 +1,70 @@
+@import "tailwindcss";
+@import "@nuxt/ui";
+
+/*
+ * "Pastel camp" palette (wired up in app.config.ts):
+ *   primary   = pastel  (sky / lake blue)
+ *   secondary = sand    (warm peach, campfire)
+ *   success   = sage    (meadow green)
+ *   neutral   = stone   (warm grey, from Tailwind)
+ */
+@theme static {
+  --font-sans: "Nunito", ui-sans-serif, system-ui, sans-serif;
+
+  --color-pastel-50: #f2f7fc;
+  --color-pastel-100: #e3eef9;
+  --color-pastel-200: #c9ddf3;
+  --color-pastel-300: #a9c8ec;
+  --color-pastel-400: #86afe2;
+  --color-pastel-500: #5f91d2;
+  --color-pastel-600: #4777b9;
+  --color-pastel-700: #3a5f96;
+  --color-pastel-800: #324f7a;
+  --color-pastel-900: #2c4364;
+  --color-pastel-950: #1d2b42;
+
+  --color-sand-50: #fdf8f1;
+  --color-sand-100: #faeedc;
+  --color-sand-200: #f4dbb8;
+  --color-sand-300: #edc491;
+  --color-sand-400: #e5aa6a;
+  --color-sand-500: #d98f4a;
+  --color-sand-600: #b8722f;
+  --color-sand-700: #955a28;
+  --color-sand-800: #7b4929;
+  --color-sand-900: #643d25;
+  --color-sand-950: #361e11;
+
+  --color-sage-50: #f3f7f2;
+  --color-sage-100: #e3ede1;
+  --color-sage-200: #c7dbc3;
+  --color-sage-300: #a2c29c;
+  --color-sage-400: #7fa678;
+  --color-sage-500: #618a5a;
+  --color-sage-600: #4c6f47;
+  --color-sage-700: #3e583a;
+  --color-sage-800: #344832;
+  --color-sage-900: #2c3c2a;
+  --color-sage-950: #162015;
+}
+
+/*
+ * Light mode: one shade deeper than the pastel tone, so white text on buttons stays readable.
+ * Dark mode: the soft pastel tones with dark text. Backgrounds are warm instead of pure white/black.
+ */
+:root {
+  --ui-primary: var(--ui-color-primary-600);
+  --ui-secondary: var(--ui-color-secondary-600);
+  --ui-success: var(--ui-color-success-600);
+  --ui-bg: #fcfbf9;
+  --ui-bg-muted: var(--ui-color-neutral-50);
+}
+
+.dark {
+  --ui-primary: var(--ui-color-primary-300);
+  --ui-secondary: var(--ui-color-secondary-300);
+  --ui-success: var(--ui-color-success-300);
+  --ui-bg: #17191d;
+  --ui-bg-muted: #1c1f24;
+  --ui-bg-elevated: #22262c;
+}
